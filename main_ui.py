@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'home.ui'
+## Form generated from reading UI file 'main.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.6.1
 ##
@@ -24,7 +24,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1139, 689)
+        MainWindow.resize(1139, 623)
         sizePolicy = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -196,6 +196,11 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_9.addWidget(self.facebook_group_rbtn)
 
+        self.rbtn2 = QRadioButton(self.account_page)
+        self.rbtn2.setObjectName(u"rbtn2")
+
+        self.horizontalLayout_9.addWidget(self.rbtn2)
+
         self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_9.addItem(self.horizontalSpacer_3)
@@ -203,49 +208,13 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_3.addLayout(self.horizontalLayout_9)
 
-        self.horizontalLayout_5 = QHBoxLayout()
-        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.link_label = QLabel(self.account_page)
-        self.link_label.setObjectName(u"link_label")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.link_label.sizePolicy().hasHeightForWidth())
-        self.link_label.setSizePolicy(sizePolicy3)
-
-        self.horizontalLayout_5.addWidget(self.link_label)
-
-        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_5.addItem(self.horizontalSpacer_5)
-
-
-        self.verticalLayout_3.addLayout(self.horizontalLayout_5)
-
-        self.horizontalLayout_6 = QHBoxLayout()
-        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
-        self.link_input = QLineEdit(self.account_page)
-        self.link_input.setObjectName(u"link_input")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        sizePolicy4.setHorizontalStretch(0)
-        sizePolicy4.setVerticalStretch(0)
-        sizePolicy4.setHeightForWidth(self.link_input.sizePolicy().hasHeightForWidth())
-        self.link_input.setSizePolicy(sizePolicy4)
-        self.link_input.setMinimumSize(QSize(250, 0))
-
-        self.horizontalLayout_6.addWidget(self.link_input)
-
-        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_6.addItem(self.horizontalSpacer_6)
-
-
-        self.verticalLayout_3.addLayout(self.horizontalLayout_6)
-
         self.horizontalLayout_10 = QHBoxLayout()
         self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
         self.link_name_label = QLabel(self.account_page)
         self.link_name_label.setObjectName(u"link_name_label")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.link_name_label.sizePolicy().hasHeightForWidth())
         self.link_name_label.setSizePolicy(sizePolicy3)
 
@@ -262,6 +231,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
         self.link_name_input = QLineEdit(self.account_page)
         self.link_name_input.setObjectName(u"link_name_input")
+        sizePolicy4 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
         sizePolicy4.setHeightForWidth(self.link_name_input.sizePolicy().hasHeightForWidth())
         self.link_name_input.setSizePolicy(sizePolicy4)
         self.link_name_input.setMinimumSize(QSize(250, 0))
@@ -274,6 +246,39 @@ class Ui_MainWindow(object):
 
 
         self.verticalLayout_3.addLayout(self.horizontalLayout_11)
+
+        self.horizontalLayout_5 = QHBoxLayout()
+        self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
+        self.link_label = QLabel(self.account_page)
+        self.link_label.setObjectName(u"link_label")
+        sizePolicy3.setHeightForWidth(self.link_label.sizePolicy().hasHeightForWidth())
+        self.link_label.setSizePolicy(sizePolicy3)
+
+        self.horizontalLayout_5.addWidget(self.link_label)
+
+        self.horizontalSpacer_5 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_5.addItem(self.horizontalSpacer_5)
+
+
+        self.verticalLayout_3.addLayout(self.horizontalLayout_5)
+
+        self.horizontalLayout_6 = QHBoxLayout()
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
+        self.link_input = QLineEdit(self.account_page)
+        self.link_input.setObjectName(u"link_input")
+        sizePolicy4.setHeightForWidth(self.link_input.sizePolicy().hasHeightForWidth())
+        self.link_input.setSizePolicy(sizePolicy4)
+        self.link_input.setMinimumSize(QSize(250, 0))
+
+        self.horizontalLayout_6.addWidget(self.link_input)
+
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_6.addItem(self.horizontalSpacer_6)
+
+
+        self.verticalLayout_3.addLayout(self.horizontalLayout_6)
 
         self.horizontalLayout_12 = QHBoxLayout()
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
@@ -295,6 +300,7 @@ class Ui_MainWindow(object):
 
         self.account_table = QTableWidget(self.account_page)
         self.account_table.setObjectName(u"account_table")
+        self.account_table.horizontalHeader().setStretchLastSection(True)
 
         self.verticalLayout_3.addWidget(self.account_table)
 
@@ -327,8 +333,9 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
+        self.exit_btn.clicked.connect(MainWindow.close)
 
-        self.page_widget.setCurrentIndex(0)
+        self.page_widget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -349,8 +356,9 @@ class Ui_MainWindow(object):
         self.post_btn.setText(QCoreApplication.translate("MainWindow", u"Post", None))
         self.social_media_label.setText(QCoreApplication.translate("MainWindow", u"Social Media :", None))
         self.facebook_group_rbtn.setText(QCoreApplication.translate("MainWindow", u"Facebook Group", None))
-        self.link_label.setText(QCoreApplication.translate("MainWindow", u"Link :", None))
+        self.rbtn2.setText(QCoreApplication.translate("MainWindow", u"Radio Button 2", None))
         self.link_name_label.setText(QCoreApplication.translate("MainWindow", u"Link Name :", None))
+        self.link_label.setText(QCoreApplication.translate("MainWindow", u"Link :", None))
         self.add_link_btn.setText(QCoreApplication.translate("MainWindow", u"Add link", None))
         self.edit_link_btn.setText(QCoreApplication.translate("MainWindow", u"Edit link", None))
         self.remove_link_btn.setText(QCoreApplication.translate("MainWindow", u"Remove link", None))

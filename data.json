@@ -1,0 +1,38 @@
+{
+  "name": {
+    "link_name": "name",
+    "checkbox": "0",
+    "link": "link1",
+    "radio_btn": "rbtn2"
+  },
+  "name2": {
+    "link_name": "name2",
+    "checkbox": "1",
+    "link": "link2",
+    "radio_btn": "rbtn2"
+  },
+  "name3": {
+    "link_name": "name3",
+    "checkbox": "1",
+    "link": "https://www.facebook.com/groups/bobyss",
+    "radio_btn": "Facebook Group"
+  },
+  "gpt": {
+    "link_name": "gpt",
+    "checkbox": "1",
+    "link": "https://chat.openai.com/c/0534eb8e-6741-4dbd-b4f0-15b642e72ab8",
+    "radio_btn": "rbtn2"
+  },
+  "not facebook group": {
+    "link_name": "not facebook group",
+    "checkbox": "1",
+    "link": "link to fb group",
+    "radio_btn": "Facebook Group"
+  },
+  "test1": {
+    "link_name": "test1",
+    "checkbox": "1",
+    "link": "test1",
+    "radio_btn": "No option selected"
+  }
+}

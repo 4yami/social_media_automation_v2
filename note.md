@@ -27,3 +27,5 @@ choose social media
 check list table
 remove item button
 
+# table
+number, checklist, name, link, social media
