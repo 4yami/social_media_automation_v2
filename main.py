@@ -14,6 +14,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.setup_ui()
         self.connect_signals()
+        
 
     def setup_ui(self):
         self.ui.setupUi(self)
@@ -33,6 +34,7 @@ class MainWindow(QMainWindow):
         self.ui.add_link_btn.clicked.connect(self.add_link)
         for radio_button in self.ui.radio_buttons_dict:
             radio_button.toggled.connect(self.get_radio_btn)
+        self.ui.remove_link_btn.clicked.connect(self.remove_link)
 
     def show_home_page(self):
         self.ui.page_widget.setCurrentIndex(0)
@@ -111,6 +113,26 @@ class MainWindow(QMainWindow):
                 else:
                     item = QTableWidgetItem(str(cell_data))
                     self.ui.account_table.setItem(row_index, col_index, item)
+                    
+    def remove_link(self):
+        row_index = self.ui.account_table.currentRow()
+        link_name = self.ui.account_table.item(row_index, 1).text()
+        if os.path.exists(DATA_JSON_PATH):
+            with open(DATA_JSON_PATH, 'r') as file:
+                data = json.load(file)
+            if link_name in data:
+                del data[link_name]
+                with open(DATA_JSON_PATH, 'w') as file:
+                    json.dump(data, file, indent=2)
+                if row_index >= 0:
+                    self.ui.account_table.removeRow(row_index)
+                    print(f"Row at index {row_index} removed.")
+                else:
+                    print("No row selected.")
+            else:
+                print(f"cant find {link_name}\n", data)
+        else:
+            print("json path didnt not found")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
