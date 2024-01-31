@@ -12,6 +12,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
+        self.account_checkboxes = {}  # Dictionary to store checkboxes
         self.setup_ui()
         self.connect_signals()
         
@@ -75,34 +76,46 @@ class MainWindow(QMainWindow):
     def read_json(self, file_path):
         if os.path.exists(file_path):
             with open(file_path, 'r') as file:
-                data = json.load(file)
-            return data
+                self.data = json.load(file)
+            return self.data
         else:
             with open(file_path, 'w') as file:
                 json.dump({}, file)
-            return {}
-
-    def write_json(self, file_path, data):
-        with open(file_path, 'w') as file:
-            json.dump(data, file, indent=2)
+            return {}  
 
     def add_data_to_json(self, file_path, new_data):
         data = self.read_json(file_path)
         data.update(new_data)
-        self.write_json(file_path, data)
+        with open(file_path, 'w') as file:
+            json.dump(data, file, indent=2)
         print(f"Data added to {file_path}")
+        
+    def save_json(self, file_path):
+        # Save JSON data back to the file
+        with open(file_path, 'w') as json_file:
+            json.dump(self.data, json_file, indent=2)
+    
+    def checkbox_changed(self, state, data_name):
+        self.read_json(DATA_JSON_PATH)
+        if state == 2:  # Qt.Checked
+            self.data[data_name]["checkbox"] = 1
+            print(f"Checkbox {data_name} checked")
+        else:
+            self.data[data_name]["checkbox"] = 0
+            print(f"Checkbox {data_name} unchecked")
+        self.save_json(DATA_JSON_PATH)
 
     def populate_table(self, json_data):
         self.ui.account_table.clearContents()
         self.ui.account_table.setRowCount(0)
-        header_labels = ["Select", "Name", "Link", "Social Media"]
+        header_labels = ["", "Name", "Link", "Social Media"]
         self.ui.account_table.setColumnCount(len(header_labels))
         self.ui.account_table.setHorizontalHeaderLabels(header_labels)
+        keys_order = ["checkbox", "link_name", "link", "radio_btn"]
 
         for row_index, (row_name, row_data) in enumerate(json_data.items()):
             self.ui.account_table.insertRow(row_index)
 
-            keys_order = ["checkbox", "link_name", "link", "radio_btn"]
             for col_index, header_label in enumerate(keys_order):
                 cell_data = row_data.get(header_label, "")
 
@@ -110,9 +123,15 @@ class MainWindow(QMainWindow):
                     checkbox = QCheckBox()
                     checkbox.setChecked(int(cell_data) == 1)
                     self.ui.account_table.setCellWidget(row_index, col_index, checkbox)
+                    
+                    # Store the checkbox in the dictionary with a unique identifier
+                    checkbox_identifier = f"{row_name}"
+                    self.account_checkboxes[checkbox_identifier] = checkbox
+                    self.account_checkboxes[checkbox_identifier].stateChanged.connect(lambda state, name=row_name: self.checkbox_changed(state, name))
                 else:
                     item = QTableWidgetItem(str(cell_data))
                     self.ui.account_table.setItem(row_index, col_index, item)
+
                     
     def remove_link(self):
         row_index = self.ui.account_table.currentRow()

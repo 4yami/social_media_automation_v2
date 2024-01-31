@@ -1,37 +1,37 @@
 {
   "name1": {
     "link_name": "name1",
-    "checkbox": "1",
+    "checkbox": 0,
     "link": "link1",
     "radio_btn": "Facebook Group"
   },
   "name2": {
     "link_name": "name2",
-    "checkbox": "1",
+    "checkbox": 0,
     "link": "link2",
     "radio_btn": "rbtn2"
   },
-  "1": {
-    "link_name": "1",
-    "checkbox": "1",
+  "name3": {
+    "link_name": "name3",
+    "checkbox": 0,
     "link": "1",
     "radio_btn": "Facebook Group"
   },
-  "2": {
-    "link_name": "2",
-    "checkbox": "1",
+  "name4": {
+    "link_name": "name4",
+    "checkbox": 1,
     "link": "2",
     "radio_btn": "Facebook Group"
   },
-  "3": {
-    "link_name": "3",
-    "checkbox": "1",
+  "name5": {
+    "link_name": "name5",
+    "checkbox": 1,
     "link": "3",
     "radio_btn": "Facebook Group"
   },
-  "5": {
-    "link_name": "5",
-    "checkbox": "1",
+  "name6": {
+    "link_name": "name6",
+    "checkbox": 1,
     "link": "5",
     "radio_btn": "Facebook Group"
   }
