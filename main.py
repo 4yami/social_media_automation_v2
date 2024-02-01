@@ -71,7 +71,6 @@ class MainWindow(QMainWindow):
         self.ui.remove_link_btn.clicked.connect(self.remove_link)
         self.ui.edit_link_btn.clicked.connect(self.edit_link)
 
-    # home_page function
     def populate_home_table(self):
         # Populate the home table with data from the JSON file
         self.ui.home_table.clearContents()
@@ -98,7 +97,6 @@ class MainWindow(QMainWindow):
                     item = QTableWidgetItem(str(cell_data))
                     self.ui.home_table.setItem(row_index, 1, item)
 
-    # account_page function
     def get_radio_btn(self):
         # Get the selected radio button's text
         selected_option = "No option selected"
@@ -129,6 +127,13 @@ class MainWindow(QMainWindow):
             return
         self.link_manager.add_data_to_json(DATA_JSON_PATH, new_data)
         self.populate_account_table()
+        self.ui.link_name_input.clear()
+        self.ui.link_input.clear()
+        for radio_button, text in self.ui.radio_buttons_dict.items():
+            radio_button.setAutoExclusive(False)
+            radio_button.setChecked(False)
+            radio_button.setAutoExclusive(False)
+            
 
     def read_json(self, file_path):
         # Read JSON data from a file and store it in the instance variable
