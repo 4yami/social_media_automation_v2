@@ -1,7 +1,10 @@
 import json
 import os
 import sys
-from PySide6.QtWidgets import QApplication, QMainWindow, QStyleFactory, QTableWidgetItem, QCheckBox, QMessageBox
+from PySide6.QtWidgets import (
+    QApplication, QMainWindow, QStyleFactory,
+    QTableWidgetItem, QCheckBox, QMessageBox
+)
 from PySide6.QtCore import Qt
 
 from main_ui import Ui_MainWindow
@@ -9,6 +12,17 @@ from main_ui import Ui_MainWindow
 DATA_JSON_PATH = "data.json"
 HOME_COLUMN_WIDTHS = [40, 197]
 ACCOUNT_COLUMN_WIDTHS = [40, 200, 450]
+
+
+NO_SOCIAL_MEDIA_SELECTED = "No option selected"
+CHECKBOX = "checkbox"
+LINK_NAME = "link_name"
+
+CHECKBOX_COLUMN_INDEX = 0
+NAME_COLUMN_INDEX = 1
+LINK_COLUMN_INDEX = 2
+SOCIAL_MEDIA_COLUMN_INDEX = 3
+
 
 
 class LinkManager:
@@ -78,32 +92,38 @@ class MainWindow(QMainWindow):
         self.home_header_label = ['', 'Name']
         self.ui.home_table.setColumnCount(len(self.home_header_label))
         self.ui.home_table.setHorizontalHeaderLabels(self.home_header_label)
-        self.read_json(DATA_JSON_PATH)
-        for row_index, (key_name, data) in enumerate(self.data.items()):
-            self.ui.home_table.insertRow(row_index)
-            for index2, (header, cell_data) in enumerate(data.items()):
-                if header == "checkbox":
-                    # Create a checkbox for the "checkbox" column
+        data = self.link_manager.read_json(DATA_JSON_PATH)
+        for home_row_index, (key_name, data1) in enumerate(data.items()):
+            self.ui.home_table.insertRow(home_row_index)
+            for index2, (header, cell_data) in enumerate(data1.items()):
+                if header == CHECKBOX:
+                    # Create a checkbox for the checkbox column
                     checkbox = QCheckBox()
                     checkbox.setChecked(int(cell_data) == 1)
-                    self.ui.home_table.setCellWidget(row_index, 0, checkbox)
+                    self.ui.home_table.setCellWidget(home_row_index, CHECKBOX_COLUMN_INDEX, checkbox)
                     checkbox_identifier = f"{key_name}"
                     self.account_checkboxes[checkbox_identifier] = checkbox
                     self.account_checkboxes[checkbox_identifier].stateChanged.connect(
                         lambda state, name=key_name: self.checkbox_changed(state, name)
                     )
-                elif header == 'link_name':
+                elif header == LINK_NAME:
                     # Populate other columns with data
-                    item = QTableWidgetItem(str(cell_data))
-                    self.ui.home_table.setItem(row_index, 1, item)
+                    home_table_item = QTableWidgetItem(str(cell_data))
+                    self.ui.home_table.setItem(home_row_index, NAME_COLUMN_INDEX, home_table_item)
 
     def get_radio_btn(self):
         # Get the selected radio button's text
-        selected_option = "No option selected"
+        selected_option = NO_SOCIAL_MEDIA_SELECTED
         for radio_button, text in self.ui.radio_buttons_dict.items():
             if radio_button.isChecked():
                 selected_option = text
         return selected_option
+
+    def unchecked_radio_btn(self):
+        for radio_button, text in self.ui.radio_buttons_dict.items():
+            radio_button.setAutoExclusive(False)
+            radio_button.setChecked(False)
+            radio_button.setAutoExclusive(False)
 
     def add_link(self):
         # Add a new link with data from the input fields
@@ -119,7 +139,7 @@ class MainWindow(QMainWindow):
                 "radio_btn": radio_btn,
             },
         }
-        if radio_btn == "No option selected":
+        if radio_btn == NO_SOCIAL_MEDIA_SELECTED:
             QMessageBox.warning(self, "Input Error", "No social media selected")
             return
         if not link_name or not link:
@@ -129,27 +149,12 @@ class MainWindow(QMainWindow):
         self.populate_account_table()
         self.ui.link_name_input.clear()
         self.ui.link_input.clear()
-        for radio_button, text in self.ui.radio_buttons_dict.items():
-            radio_button.setAutoExclusive(False)
-            radio_button.setChecked(False)
-            radio_button.setAutoExclusive(False)
-            
-
-    def read_json(self, file_path):
-        # Read JSON data from a file and store it in the instance variable
-        if os.path.exists(file_path):
-            with open(file_path, 'r') as file:
-                self.data = json.load(file)
-            return self.data
-        else:
-            with open(file_path, 'w') as file:
-                json.dump({}, file)
-            return {}
+        self.unchecked_radio_btn()
 
     def checkbox_changed(self, state, data_name):
         # Update the checkbox state in the JSON data and refresh the account table
         data = self.link_manager.read_json(DATA_JSON_PATH)
-        data[data_name]["checkbox"] = int(state == Qt.Checked)
+        data[data_name][CHECKBOX] = int(state == Qt.Checked)
         self.link_manager.save_json(DATA_JSON_PATH, data)
         self.populate_account_table()
 
@@ -161,16 +166,16 @@ class MainWindow(QMainWindow):
         self.ui.account_table.setColumnCount(len(self.account_header_labels))
         self.ui.account_table.setHorizontalHeaderLabels(self.account_header_labels)
         keys_order = ["checkbox", "link_name", "link", "radio_btn"]
-        self.read_json(DATA_JSON_PATH)
-        for row_index, (row_name, row_data) in enumerate(self.data.items()):
-            self.ui.account_table.insertRow(row_index)
-            for col_index, header_label in enumerate(keys_order):
+        data = self.link_manager.read_json(DATA_JSON_PATH)
+        for row_index_account_table, (row_name, row_data) in enumerate(data.items()):
+            self.ui.account_table.insertRow(row_index_account_table)
+            for col_index_account, header_label in enumerate(keys_order):
                 cell_data = row_data.get(header_label)
-                if header_label == "checkbox":
-                    # Create a checkbox for the "checkbox" column
+                if header_label == CHECKBOX:
+                    # Create a checkbox for the checkbox column
                     checkbox = QCheckBox()
                     checkbox.setChecked(int(cell_data) == 1)
-                    self.ui.account_table.setCellWidget(row_index, col_index, checkbox)
+                    self.ui.account_table.setCellWidget(row_index_account_table, col_index_account, checkbox)
 
                     # Store the checkbox in the dictionary with a unique identifier
                     checkbox_identifier = f"{row_name}"
@@ -180,13 +185,13 @@ class MainWindow(QMainWindow):
                     )
                 else:
                     # Populate other columns with data
-                    item = QTableWidgetItem(str(cell_data))
-                    self.ui.account_table.setItem(row_index, col_index, item)
+                    account_table_item = QTableWidgetItem(str(cell_data))
+                    self.ui.account_table.setItem(row_index_account_table, col_index_account, account_table_item)
 
     def remove_link(self):
         # Remove the selected link and update the account table
         row_index = self.ui.account_table.currentRow()
-        link_name = self.ui.account_table.item(row_index, 1).text()
+        link_name = self.ui.account_table.item(row_index, NAME_COLUMN_INDEX).text()
         data = self.link_manager.read_json(DATA_JSON_PATH)
 
         if link_name in data:
