@@ -83,32 +83,8 @@ class MainWindow(QMainWindow):
         self.ui.remove_link_btn.clicked.connect(self.remove_link)
         self.ui.edit_link_btn.clicked.connect(self.edit_link)
 
-    def populate_home_table(self):
-        # Populate the home table with data from the JSON file
-        self.ui.home_table.clearContents()
-        self.ui.home_table.setRowCount(0)
-        self.home_header_label = ['', 'Name']
-        self.ui.home_table.setColumnCount(len(self.home_header_label))
-        self.ui.home_table.setHorizontalHeaderLabels(self.home_header_label)
-        data = self.link_manager.read_json(DATA_JSON_PATH)
-        for home_row_index, (key_name, data1) in enumerate(data.items()):
-            self.ui.home_table.insertRow(home_row_index)
-            for index2, (header, cell_data) in enumerate(data1.items()):
-                if header == CHECKBOX:
-                    # Create a checkbox for the checkbox column
-                    checkbox = QCheckBox()
-                    checkbox.setChecked(int(cell_data) == 1)
-                    self.ui.home_table.setCellWidget(home_row_index, CHECKBOX_COLUMN_INDEX, checkbox)
-                    checkbox_identifier = f"{key_name}"
-                    self.account_checkboxes[checkbox_identifier] = checkbox
-                    self.account_checkboxes[checkbox_identifier].stateChanged.connect(
-                        lambda state, name=key_name: self.checkbox_changed(state, name)
-                    )
-                elif header == LINK_NAME:
-                    # Populate other columns with data
-                    home_table_item = QTableWidgetItem(str(cell_data))
-                    self.ui.home_table.setItem(home_row_index, NAME_COLUMN_INDEX, home_table_item)
 
+    # background function
     def get_radio_btn(self):
         # Get the selected radio button's text
         selected_option = NO_SOCIAL_MEDIA_SELECTED
@@ -123,6 +99,46 @@ class MainWindow(QMainWindow):
             radio_button.setChecked(False)
             radio_button.setAutoExclusive(False)
 
+    def checkbox_changed(self, state, data_name):
+        # Update the checkbox state in the JSON data and refresh the account table
+        data = self.link_manager.read_json(DATA_JSON_PATH)
+        data[data_name][CHECKBOX] = int(state == 2)
+        self.link_manager.save_json(DATA_JSON_PATH, data)
+        self.populate_account_table()
+
+
+    # home page ui function
+    # def add(self):
+        
+    
+    def populate_home_table(self):
+            # Populate the home table with data from the JSON file
+            self.ui.home_table.clearContents()
+            self.ui.home_table.setRowCount(0)
+            self.home_header_label = ['', 'Name']
+            self.ui.home_table.setColumnCount(len(self.home_header_label))
+            self.ui.home_table.setHorizontalHeaderLabels(self.home_header_label)
+            data = self.link_manager.read_json(DATA_JSON_PATH)
+            for home_row_index, (key_name, data1) in enumerate(data.items()):
+                self.ui.home_table.insertRow(home_row_index)
+                for index2, (header, cell_data) in enumerate(data1.items()):
+                    if header == CHECKBOX:
+                        # Create a checkbox for the checkbox column
+                        checkbox = QCheckBox()
+                        checkbox.setChecked(int(cell_data) == 1)
+                        self.ui.home_table.setCellWidget(home_row_index, CHECKBOX_COLUMN_INDEX, checkbox)
+                        checkbox_identifier = f"{key_name}"
+                        self.account_checkboxes[checkbox_identifier] = checkbox
+                        self.account_checkboxes[checkbox_identifier].stateChanged.connect(
+                            lambda state, name=key_name: self.checkbox_changed(state, name)
+                        )
+                    elif header == LINK_NAME:
+                        # Populate other columns with data
+                        home_table_item = QTableWidgetItem(str(cell_data))
+                        self.ui.home_table.setItem(home_row_index, NAME_COLUMN_INDEX, home_table_item)
+
+
+    # account page ui function
     def add_link(self):
         # Add a new link with data from the input fields
         check_box = 1
@@ -147,14 +163,7 @@ class MainWindow(QMainWindow):
         self.populate_account_table()
         self.ui.link_name_input.clear()
         self.ui.link_input.clear()
-        self.unchecked_radio_btn()
-
-    def checkbox_changed(self, state, data_name):
-        # Update the checkbox state in the JSON data and refresh the account table
-        data = self.link_manager.read_json(DATA_JSON_PATH)
-        data[data_name][CHECKBOX] = int(state == 2)
-        self.link_manager.save_json(DATA_JSON_PATH, data)
-        self.populate_account_table()
+        self.unchecked_radio_btn()    
 
     def populate_account_table(self):
         # Populate the account table with data from the JSON file
@@ -218,6 +227,7 @@ class MainWindow(QMainWindow):
                     if text == item:
                         radio_button.setChecked(True)
         self.remove_link()
+
 
     # show page
     def show_home_page(self):

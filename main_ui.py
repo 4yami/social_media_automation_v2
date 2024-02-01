@@ -339,7 +339,7 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         self.exit_btn.clicked.connect(MainWindow.close)
 
-        self.page_widget.setCurrentIndex(1)
+        self.page_widget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
