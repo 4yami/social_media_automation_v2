@@ -2,18 +2,44 @@ import json
 import os
 import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QStyleFactory, QTableWidgetItem, QCheckBox, QMessageBox
+from PySide6.QtCore import Qt
 
 from main_ui import Ui_MainWindow
+
 
 DATA_JSON_PATH = "data.json"
 HOME_COLUMN_WIDTHS = [40, 197]
 ACCOUNT_COLUMN_WIDTHS = [40, 200, 450]
 
+
+class LinkManager:
+    @staticmethod
+    def read_json(file_path):
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as file:
+                return json.load(file)
+        else:
+            return {}
+
+    @staticmethod
+    def add_data_to_json(file_path, new_data):
+        data = LinkManager.read_json(file_path)
+        data.update(new_data)
+        with open(file_path, 'w') as file:
+            json.dump(data, file, indent=2)
+
+    @staticmethod
+    def save_json(file_path, data):
+        with open(file_path, 'w') as json_file:
+            json.dump(data, json_file, indent=2)
+            
+            
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
-        self.account_checkboxes = {}  # Dictionary to store checkboxes
+        self.link_manager = LinkManager()
+        self.account_checkboxes = {}
         self.setup_ui()
         self.connect_signals()
         
@@ -62,7 +88,6 @@ class MainWindow(QMainWindow):
                 elif header == 'link_name':
                     item = QTableWidgetItem(str(cell_data))
                     self.ui.home_table.setItem(row_index, 1, item)
-                print(key_name)
         
     # account_page function
     def get_radio_btn(self):
@@ -85,15 +110,12 @@ class MainWindow(QMainWindow):
                 "radio_btn": radio_btn,
             },
         }
-        # messagebox warning
         if radio_btn == "No option selected":
             return QMessageBox.warning(self, "Input Error", "No social media selected")
         if not link_name or not link:
             return QMessageBox.warning(self, "Input Error", "Link name and link cannot be empty.")
-        self.add_data_to_json(DATA_JSON_PATH, new_data)
-        self.populate_account_table(self.read_json(DATA_JSON_PATH))
-        self.ui.link_name_input.clear()
-        self.ui.link_input.clear()
+        self.link_manager.add_data_to_json(DATA_JSON_PATH, new_data)
+        self.populate_account_table()
 
     def read_json(self, file_path):
         if os.path.exists(file_path):
@@ -104,25 +126,12 @@ class MainWindow(QMainWindow):
             with open(file_path, 'w') as file:
                 json.dump({}, file)
             return {}  
-
-    def add_data_to_json(self, file_path, new_data):
-        data = self.read_json(file_path)
-        data.update(new_data)
-        with open(file_path, 'w') as file:
-            json.dump(data, file, indent=2)
-        
-    def save_json(self, file_path):
-        # Save JSON data back to the file
-        with open(file_path, 'w') as json_file:
-            json.dump(self.data, json_file, indent=2)
     
     def checkbox_changed(self, state, data_name):
-        self.read_json(DATA_JSON_PATH)
-        if state == 2:  # Qt.Checked
-            self.data[data_name]["checkbox"] = 1
-        else:
-            self.data[data_name]["checkbox"] = 0
-        self.save_json(DATA_JSON_PATH)
+        data = self.link_manager.read_json(DATA_JSON_PATH)
+        data[data_name]["checkbox"] = int(state == Qt.Checked)
+        self.link_manager.save_json(DATA_JSON_PATH, data)
+        self.populate_account_table()
 
     def populate_account_table(self):
         self.ui.account_table.clearContents()
@@ -152,21 +161,17 @@ class MainWindow(QMainWindow):
     def remove_link(self):
         row_index = self.ui.account_table.currentRow()
         link_name = self.ui.account_table.item(row_index, 1).text()
-        if os.path.exists(DATA_JSON_PATH):
-            with open(DATA_JSON_PATH, 'r') as file:
-                data = json.load(file)
-            if link_name in data:
-                del data[link_name]
-                with open(DATA_JSON_PATH, 'w') as file:
-                    json.dump(data, file, indent=2)
-                if row_index >= 0:
-                    self.ui.account_table.removeRow(row_index)
-                else:
-                    print("No row selected.")
+        data = self.link_manager.read_json(DATA_JSON_PATH)
+
+        if link_name in data:
+            del data[link_name]
+            self.link_manager.save_json(DATA_JSON_PATH, data)
+            if row_index >= 0:
+                self.ui.account_table.removeRow(row_index)
             else:
-                print(f"cant find {link_name}\n", data)
+                print("No row selected.")
         else:
-            print("json path didnt not found")
+            print(f"Can't find {link_name}\n", data)
 
     def edit_link(self):
         row_index = self.ui.account_table.currentRow()
