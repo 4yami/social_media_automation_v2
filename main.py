@@ -23,8 +23,6 @@ NAME_COLUMN_INDEX = 1
 LINK_COLUMN_INDEX = 2
 SOCIAL_MEDIA_COLUMN_INDEX = 3
 
-
-
 class LinkManager:
     @staticmethod
     def read_json(file_path):
@@ -154,7 +152,7 @@ class MainWindow(QMainWindow):
     def checkbox_changed(self, state, data_name):
         # Update the checkbox state in the JSON data and refresh the account table
         data = self.link_manager.read_json(DATA_JSON_PATH)
-        data[data_name][CHECKBOX] = int(state == Qt.Checked)
+        data[data_name][CHECKBOX] = int(state == 2)
         self.link_manager.save_json(DATA_JSON_PATH, data)
         self.populate_account_table()
 
