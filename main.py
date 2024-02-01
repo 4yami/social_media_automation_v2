@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 
 from main_ui import Ui_MainWindow
+from post_automation import PostAutomation
 
 DATA_JSON_PATH = "data.json"
 HOME_COLUMN_WIDTHS = [40, 197]

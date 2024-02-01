@@ -26,34 +26,29 @@ class PostAutomation():
     def close_browser(browser):
         browser.close()
         
-    def post_fb_group(self, url, select_write_something, select_public_post, text, photo_button_selector, file_input_selector, image_paths, final_post):
+    def post_fb_group(self, url, text, image_paths):
         self.open_chrome()
         with sync_playwright() as playwright:
             browser = playwright.chromium.connect_over_cdp("http://localhost:9222")
             default_context = browser.contexts[0]
             self.page = default_context.pages[0]
             self.goto_page(url)
-            self.click_element(select_write_something)
-            self.click_element(select_public_post)
+            self.click_element('span:has-text("Write something...")')
+            self.click_element('div:has-text("Create a public post…")')
             self.type_text(text)
-            self.click_element(photo_button_selector)
-            self.upload_images(file_input_selector, image_paths)
-            # self.click_element(final_post)
+            self.click_element('[aria-label="Photo/video"]')
+            self.upload_images('input[type="file"][multiple]', image_paths)
+            # self.click_element('[aria-label="Post"]')
             input("done")
     
     
 if __name__ == "__main__":
     url = "https://www.facebook.com/groups/5511711472209823"
-    select_write_something = 'span:has-text("Write something...")'
-    select_public_post = 'div:has-text("Create a public post…")'
     text = "anything"
-    photo_button_selector = '[aria-label="Photo/video"]'
-    file_input_selector = 'input[type="file"][multiple]'
     image_paths = [
         'C:\\Users\\syahm\\Pictures\\hatsu\\hatsu14.jpg', 
         'C:\\Users\\syahm\\Pictures\\hatsu\\hatsu9.jpg'
         ]
-    final_post = '[aria-label="Post"]'
     klas = PostAutomation()
-    klas.post_fb_group(url,select_write_something, select_public_post, text, photo_button_selector, file_input_selector, image_paths, final_post)
+    klas.post_fb_group(url, text, image_paths)
     
