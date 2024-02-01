@@ -6,7 +6,8 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QStyleFactory, QTableWi
 from main_ui import Ui_MainWindow
 
 DATA_JSON_PATH = "data.json"
-COLUMN_WIDTHS = [40, 200, 450]
+HOME_COLUMN_WIDTHS = [40, 197]
+ACCOUNT_COLUMN_WIDTHS = [40, 200, 450]
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -16,7 +17,6 @@ class MainWindow(QMainWindow):
         self.setup_ui()
         self.connect_signals()
         
-
     def setup_ui(self):
         self.ui.setupUi(self)
         QApplication.setStyle(QStyleFactory.create("fusion"))
@@ -25,8 +25,11 @@ class MainWindow(QMainWindow):
             self.ui.facebook_group_rbtn: 'Facebook Group',
             self.ui.rbtn2: "rbtn2",
         }
-        self.populate_table(self.read_json(DATA_JSON_PATH))
-        for i, width in enumerate(COLUMN_WIDTHS):
+        self.populate_home_table()
+        for i, width in enumerate(HOME_COLUMN_WIDTHS):
+            self.ui.home_table.horizontalHeader().resizeSection(i, width)
+        self.populate_account_table()
+        for i, width in enumerate(ACCOUNT_COLUMN_WIDTHS):
             self.ui.account_table.horizontalHeader().resizeSection(i, width)
 
     def connect_signals(self):
@@ -38,12 +41,30 @@ class MainWindow(QMainWindow):
         self.ui.remove_link_btn.clicked.connect(self.remove_link)
         self.ui.edit_link_btn.clicked.connect(self.edit_link)
 
-    def show_home_page(self):
-        self.ui.page_widget.setCurrentIndex(0)
-
-    def show_account_page(self):
-        self.ui.page_widget.setCurrentIndex(1)
-
+    # home_page function
+    def populate_home_table(self):
+        self.ui.home_table.clearContents()
+        self.ui.home_table.setRowCount(0)
+        self.home_header_label = ['', 'Name']
+        self.ui.home_table.setColumnCount(len(self.home_header_label))
+        self.ui.home_table.setHorizontalHeaderLabels(self.home_header_label)
+        self.read_json(DATA_JSON_PATH)
+        for row_index, (key_name, data) in enumerate(self.data.items()):
+            self.ui.home_table.insertRow(row_index)
+            for index2, (header, cell_data) in enumerate(data.items()):
+                if header == "checkbox":
+                    checkbox = QCheckBox()
+                    checkbox.setChecked(int(cell_data) == 1)
+                    self.ui.home_table.setCellWidget(row_index, 0, checkbox)
+                    checkbox_identifier = f"{key_name}"
+                    self.account_checkboxes[checkbox_identifier] = checkbox
+                    self.account_checkboxes[checkbox_identifier].stateChanged.connect(lambda state, name=key_name: self.checkbox_changed(state, name))
+                elif header == 'link_name':
+                    item = QTableWidgetItem(str(cell_data))
+                    self.ui.home_table.setItem(row_index, 1, item)
+                print(key_name)
+        
+    # account_page function
     def get_radio_btn(self):
         selected_option = "No option selected"
         for radio_button, text in self.ui.radio_buttons_dict.items():
@@ -52,7 +73,7 @@ class MainWindow(QMainWindow):
         return selected_option
 
     def add_link(self):
-        check_box = "1"
+        check_box = 1
         link_name = self.ui.link_name_input.text()
         link = self.ui.link_input.text()
         radio_btn = self.get_radio_btn()
@@ -70,7 +91,7 @@ class MainWindow(QMainWindow):
         if not link_name or not link:
             return QMessageBox.warning(self, "Input Error", "Link name and link cannot be empty.")
         self.add_data_to_json(DATA_JSON_PATH, new_data)
-        self.populate_table(self.read_json(DATA_JSON_PATH))
+        self.populate_account_table(self.read_json(DATA_JSON_PATH))
         self.ui.link_name_input.clear()
         self.ui.link_input.clear()
 
@@ -103,20 +124,18 @@ class MainWindow(QMainWindow):
             self.data[data_name]["checkbox"] = 0
         self.save_json(DATA_JSON_PATH)
 
-    def populate_table(self, json_data):
+    def populate_account_table(self):
         self.ui.account_table.clearContents()
         self.ui.account_table.setRowCount(0)
-        self.header_labels = ["", "Name", "Link", "Social Media"]
-        self.ui.account_table.setColumnCount(len(self.header_labels))
-        self.ui.account_table.setHorizontalHeaderLabels(self.header_labels)
+        self.account_header_labels = ["", "Name", "Link", "Social Media"]
+        self.ui.account_table.setColumnCount(len(self.account_header_labels))
+        self.ui.account_table.setHorizontalHeaderLabels(self.account_header_labels)
         keys_order = ["checkbox", "link_name", "link", "radio_btn"]
-
-        for row_index, (row_name, row_data) in enumerate(json_data.items()):
+        self.read_json(DATA_JSON_PATH)
+        for row_index, (row_name, row_data) in enumerate(self.data.items()):
             self.ui.account_table.insertRow(row_index)
-
             for col_index, header_label in enumerate(keys_order):
-                cell_data = row_data.get(header_label, "")
-
+                cell_data = row_data.get(header_label)
                 if header_label == "checkbox":
                     checkbox = QCheckBox()
                     checkbox.setChecked(int(cell_data) == 1)
@@ -129,7 +148,6 @@ class MainWindow(QMainWindow):
                 else:
                     item = QTableWidgetItem(str(cell_data))
                     self.ui.account_table.setItem(row_index, col_index, item)
-
                     
     def remove_link(self):
         row_index = self.ui.account_table.currentRow()
@@ -152,7 +170,7 @@ class MainWindow(QMainWindow):
 
     def edit_link(self):
         row_index = self.ui.account_table.currentRow()
-        for col_index, header in enumerate(self.header_labels):
+        for col_index, header in enumerate(self.account_header_labels):
             if header == "Name":
                 item = self.ui.account_table.item(row_index, col_index).text()
                 self.ui.link_name_input.setText(item)
@@ -166,6 +184,14 @@ class MainWindow(QMainWindow):
                         radio_button.setChecked(True)
         self.remove_link()
         
+    # show page
+    def show_home_page(self):
+        self.populate_home_table()
+        self.ui.page_widget.setCurrentIndex(0)
+
+    def show_account_page(self):
+        self.populate_account_table()
+        self.ui.page_widget.setCurrentIndex(1)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
