@@ -20,7 +20,7 @@ class MainWindow(QMainWindow):
     def setup_ui(self):
         self.ui.setupUi(self)
         QApplication.setStyle(QStyleFactory.create("fusion"))
-        self.ui.page_widget.setCurrentIndex(1)
+        self.ui.page_widget.setCurrentIndex(0)
         self.ui.radio_buttons_dict = {
             self.ui.facebook_group_rbtn: 'Facebook Group',
             self.ui.rbtn2: "rbtn2",
@@ -36,6 +36,7 @@ class MainWindow(QMainWindow):
         for radio_button in self.ui.radio_buttons_dict:
             radio_button.toggled.connect(self.get_radio_btn)
         self.ui.remove_link_btn.clicked.connect(self.remove_link)
+        self.ui.edit_link_btn.clicked.connect(self.edit_link)
 
     def show_home_page(self):
         self.ui.page_widget.setCurrentIndex(0)
@@ -88,7 +89,6 @@ class MainWindow(QMainWindow):
         data.update(new_data)
         with open(file_path, 'w') as file:
             json.dump(data, file, indent=2)
-        print(f"Data added to {file_path}")
         
     def save_json(self, file_path):
         # Save JSON data back to the file
@@ -99,18 +99,16 @@ class MainWindow(QMainWindow):
         self.read_json(DATA_JSON_PATH)
         if state == 2:  # Qt.Checked
             self.data[data_name]["checkbox"] = 1
-            print(f"Checkbox {data_name} checked")
         else:
             self.data[data_name]["checkbox"] = 0
-            print(f"Checkbox {data_name} unchecked")
         self.save_json(DATA_JSON_PATH)
 
     def populate_table(self, json_data):
         self.ui.account_table.clearContents()
         self.ui.account_table.setRowCount(0)
-        header_labels = ["", "Name", "Link", "Social Media"]
-        self.ui.account_table.setColumnCount(len(header_labels))
-        self.ui.account_table.setHorizontalHeaderLabels(header_labels)
+        self.header_labels = ["", "Name", "Link", "Social Media"]
+        self.ui.account_table.setColumnCount(len(self.header_labels))
+        self.ui.account_table.setHorizontalHeaderLabels(self.header_labels)
         keys_order = ["checkbox", "link_name", "link", "radio_btn"]
 
         for row_index, (row_name, row_data) in enumerate(json_data.items()):
@@ -145,13 +143,29 @@ class MainWindow(QMainWindow):
                     json.dump(data, file, indent=2)
                 if row_index >= 0:
                     self.ui.account_table.removeRow(row_index)
-                    print(f"Row at index {row_index} removed.")
                 else:
                     print("No row selected.")
             else:
                 print(f"cant find {link_name}\n", data)
         else:
             print("json path didnt not found")
+
+    def edit_link(self):
+        row_index = self.ui.account_table.currentRow()
+        for col_index, header in enumerate(self.header_labels):
+            if header == "Name":
+                item = self.ui.account_table.item(row_index, col_index).text()
+                self.ui.link_name_input.setText(item)
+            if header == "Link":
+                item = self.ui.account_table.item(row_index, col_index).text()
+                self.ui.link_input.setText(item)
+            if header == "Social Media":
+                item = self.ui.account_table.item(row_index, col_index).text()
+                for radio_button, text in self.ui.radio_buttons_dict.items():
+                    if text == item:
+                        radio_button.setChecked(True)
+        self.remove_link()
+        
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
