@@ -146,7 +146,7 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>image navigator</string>
+                <string/>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>

@@ -358,7 +358,7 @@ class Ui_MainWindow(object):
         self.account_btn.setText(QCoreApplication.translate("MainWindow", u"Account", None))
         self.exit_btn.setText(QCoreApplication.translate("MainWindow", u"Exit", None))
         self.image_label.setText(QCoreApplication.translate("MainWindow", u"image label", None))
-        self.image_nav_label.setText(QCoreApplication.translate("MainWindow", u"image navigator", None))
+        self.image_nav_label.setText("")
         self.add_btn.setText(QCoreApplication.translate("MainWindow", u"Add", None))
         self.previous_btn.setText(QCoreApplication.translate("MainWindow", u"Previous", None))
         self.next_btn.setText(QCoreApplication.translate("MainWindow", u"Next", None))

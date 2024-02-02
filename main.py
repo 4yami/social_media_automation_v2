@@ -60,7 +60,6 @@ class MainWindow(QMainWindow):
         self.current_images_index = 0
         self.setup_ui()
         self.connect_signals()
-        # self.resizeEvent()
 
     def setup_ui(self):
         # Set up the user interface
@@ -87,6 +86,9 @@ class MainWindow(QMainWindow):
         
         # for home
         self.ui.add_btn.clicked.connect(self.add)
+        self.ui.previous_btn.clicked.connect(self.previous)
+        self.ui.next_btn.clicked.connect(self.next)
+        self.ui.remove_btn.clicked.connect(self.remove)
         
         # for account
         self.ui.add_link_btn.clicked.connect(self.add_link)
@@ -123,10 +125,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).resizeEvent(event)
         self.image_label()
 
-    def update_indicator_label(self):
-                self.ui.image_nav_label.setText(f"image {self.current_images_index + 1}/{len(self.selected_files_list)}")
-
-
+    
     # home page ui function
     def image_label(self):
         try:
@@ -137,9 +136,12 @@ class MainWindow(QMainWindow):
                 mode=Qt.TransformationMode.SmoothTransformation
             )
             self.ui.image_label.setPixmap(pixmap)
-            self.update_indicator_label()
+            self.image_nav_label()
         except Exception as e:
             print(f"Error showing image: {e}")
+            
+    def image_nav_label(self):
+        self.ui.image_nav_label.setText(f"Image {self.current_images_index + 1}/{len(self.selected_files_list)}")
     
     def add(self):
         file_dialog = QFileDialog()
@@ -150,6 +152,35 @@ class MainWindow(QMainWindow):
             self.selected_files_list.extend(selected_files)
             print(self.selected_files_list)
             self.image_label()
+    
+    def previous(self):
+        """Show the next image in the list."""
+        self.current_images_index = (self.current_images_index - 1) % len(self.selected_files_list)
+        self.image_label()
+    
+    def next(self):
+        """Show the next image in the list."""
+        self.current_images_index = (self.current_images_index + 1) % len(self.selected_files_list)
+        self.image_label()
+    
+    def remove(self):
+        """Remove the currently displayed image."""
+        try:
+            if self.selected_files_list:
+                self.selected_files_list.pop(self.current_images_index)
+                if not self.selected_files_list:
+                    self.reset_viewer_state()
+                else:
+                    self.current_images_index = min(self.current_images_index, len(self.selected_files_list) - 1)
+                self.image_label()
+        except Exception as e:
+            print(f"Error removing image: {e}")
+            
+    def reset_viewer_state(self):
+        """Reset the state of the image viewer."""
+        self.current_images_index = 0
+        self.ui.image_label.clear()
+        self.ui.image_nav_label.clear()
     
     def populate_home_table(self):
             # Populate the home table with data from the JSON file
