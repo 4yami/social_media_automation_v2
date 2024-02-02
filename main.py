@@ -3,12 +3,13 @@ import os
 import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QStyleFactory,
-    QTableWidgetItem, QCheckBox, QMessageBox
+    QTableWidgetItem, QCheckBox, QMessageBox, QFileDialog
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QPixmap
 
 from main_ui import Ui_MainWindow
-from post_automation import PostAutomation
+# from post_automation import PostAutomation
 
 DATA_JSON_PATH = "data.json"
 HOME_COLUMN_WIDTHS = [40, 197]
@@ -55,8 +56,11 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.link_manager = LinkManager()
         self.account_checkboxes = {}
+        self.selected_files_list = []
+        self.current_images_index = 0
         self.setup_ui()
         self.connect_signals()
+        # self.resizeEvent()
 
     def setup_ui(self):
         # Set up the user interface
@@ -76,8 +80,15 @@ class MainWindow(QMainWindow):
 
     def connect_signals(self):
         # Connect signals to their respective slots
+        
+        # for all
         self.ui.home_btn.clicked.connect(self.show_home_page)
         self.ui.account_btn.clicked.connect(self.show_account_page)
+        
+        # for home
+        self.ui.add_btn.clicked.connect(self.add)
+        
+        # for account
         self.ui.add_link_btn.clicked.connect(self.add_link)
         for radio_button in self.ui.radio_buttons_dict:
             radio_button.toggled.connect(self.get_radio_btn)
@@ -107,10 +118,38 @@ class MainWindow(QMainWindow):
         self.link_manager.save_json(DATA_JSON_PATH, data)
         self.populate_account_table()
 
+    def resizeEvent(self, event):
+        """Handle the window resize event."""
+        super(MainWindow, self).resizeEvent(event)
+        self.image_label()
+
+    def update_indicator_label(self):
+                self.ui.image_nav_label.setText(f"image {self.current_images_index + 1}/{len(self.selected_files_list)}")
+
 
     # home page ui function
-    # def add(self):
-        
+    def image_label(self):
+        try:
+            if self.selected_files_list:
+                pixmap = QPixmap(self.selected_files_list[self.current_images_index]).scaled(
+                self.ui.image_label.size(),
+                aspectMode=Qt.AspectRatioMode.KeepAspectRatio,
+                mode=Qt.TransformationMode.SmoothTransformation
+            )
+            self.ui.image_label.setPixmap(pixmap)
+            self.update_indicator_label()
+        except Exception as e:
+            print(f"Error showing image: {e}")
+    
+    def add(self):
+        file_dialog = QFileDialog()
+        file_dialog.setNameFilter("Images (*.png *.jpg *.jpeg)")
+        file_dialog.setFileMode(QFileDialog.FileMode.ExistingFiles)
+        if file_dialog.exec() == QFileDialog.Accepted:
+            selected_files = file_dialog.selectedFiles()
+            self.selected_files_list.extend(selected_files)
+            print(self.selected_files_list)
+            self.image_label()
     
     def populate_home_table(self):
             # Populate the home table with data from the JSON file
@@ -245,5 +284,5 @@ class MainWindow(QMainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
-    window.show()
+    window.showMaximized()
     sys.exit(app.exec())
