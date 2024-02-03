@@ -1,6 +1,8 @@
 import json
 import os
 import sys
+import logging
+from logging.handlers import TimedRotatingFileHandler
 from threading import Thread
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QStyleFactory,
@@ -12,10 +14,12 @@ from PySide6.QtGui import QPixmap, QIcon
 from main_ui import Ui_MainWindow
 from post_automation import PostAutomation
 
-DATA_JSON_PATH = "data.json"
+APPDATA_PATH = os.path.join(os.getenv('APPDATA'), 'Social_Media_Automation')
+DATA_JSON_PATH = os.path.join(APPDATA_PATH, "data.json")
+APP_LOG_PATH = os.path.join(APPDATA_PATH, 'app.log')
+
 HOME_COLUMN_WIDTHS = [40, 197]
 ACCOUNT_COLUMN_WIDTHS = [40, 200, 450]
-
 
 NO_SOCIAL_MEDIA_SELECTED = "No option selected"
 CHECKBOX = "checkbox"
@@ -28,33 +32,46 @@ LINK_COLUMN_INDEX = 2
 SOCIAL_MEDIA_COLUMN_INDEX = 3
 
 class LinkManager:
+    """Manage reading and writing JSON data."""
+    
     @staticmethod
     def read_json(file_path):
-        # Read JSON data from a file and return it
-        if os.path.exists(file_path):
-            with open(file_path, 'r') as file:
-                return json.load(file)
-        else:
+        """Read JSON data from a file and return it."""
+        try:
+            if os.path.exists(file_path):
+                with open(file_path, 'r') as file:
+                    return json.load(file)
+            else:
+                return {}
+        except Exception as e:
+            logging.error(f"Error reading JSON file: {e}")
             return {}
 
     @staticmethod
     def add_data_to_json(file_path, new_data):
-        # Read existing JSON data, update with new data, and write back to the file
-        data = LinkManager.read_json(file_path)
-        data.update(new_data)
-        with open(file_path, 'w') as file:
-            json.dump(data, file, indent=2)
+        try:
+            data = LinkManager.read_json(file_path)
+            data.update(new_data)
+            with open(file_path, 'w') as file:
+                json.dump(data, file, indent=2)
+        except Exception as e:
+            logging.error(f"Error adding data to JSON file: {e}")
 
     @staticmethod
     def save_json(file_path, data):
-        # Save JSON data to a file
-        with open(file_path, 'w') as json_file:
-            json.dump(data, json_file, indent=2)
+        try:
+            with open(file_path, 'w') as json_file:
+                json.dump(data, json_file, indent=2)
+        except Exception as e:
+            logging.error(f"Error saving JSON data to file: {e}")
 
 
 class MainWindow(QMainWindow):
+    """Main application window."""
     def __init__(self):
+        """Initialize the main window."""
         super(MainWindow, self).__init__()
+        self.create_dir_jsonlog()
         self.ui = Ui_MainWindow()
         self.link_manager = LinkManager()
         self.post_automation = PostAutomation()
@@ -65,7 +82,7 @@ class MainWindow(QMainWindow):
         self.connect_signals()
 
     def setup_ui(self):
-        # Set up the user interface
+        """Set up the user interface."""
         self.ui.setupUi(self)
         self.setWindowIcon(QIcon("auto.png"))
         QApplication.setStyle(QStyleFactory.create("fusion"))
@@ -83,27 +100,42 @@ class MainWindow(QMainWindow):
 
     def connect_signals(self):
         # Connect signals to their respective slots
-        
-        # for all
-        self.ui.home_btn.clicked.connect(self.show_home_page)
-        self.ui.account_btn.clicked.connect(self.show_account_page)
-        
-        # for home
-        self.ui.add_btn.clicked.connect(self.add)
-        self.ui.previous_btn.clicked.connect(self.previous)
-        self.ui.next_btn.clicked.connect(self.next)
-        self.ui.remove_btn.clicked.connect(self.remove)
-        self.ui.post_btn.clicked.connect(self.post)
-        
-        # for account
-        self.ui.add_link_btn.clicked.connect(self.add_link)
-        for radio_button in self.ui.radio_buttons_dict:
-            radio_button.toggled.connect(self.get_radio_btn)
-        self.ui.remove_link_btn.clicked.connect(self.remove_link)
-        self.ui.edit_link_btn.clicked.connect(self.edit_link)
-
+        try:
+            # for all
+            self.ui.home_btn.clicked.connect(self.show_home_page)
+            self.ui.account_btn.clicked.connect(self.show_account_page)
+            
+            # for home
+            self.ui.add_btn.clicked.connect(self.add)
+            self.ui.previous_btn.clicked.connect(self.previous)
+            self.ui.next_btn.clicked.connect(self.next)
+            self.ui.remove_btn.clicked.connect(self.remove)
+            self.ui.post_btn.clicked.connect(self.post)
+            
+            # for account
+            self.ui.add_link_btn.clicked.connect(self.add_link)
+            for radio_button in self.ui.radio_buttons_dict:
+                radio_button.toggled.connect(self.get_radio_btn)
+            self.ui.remove_link_btn.clicked.connect(self.remove_link)
+            self.ui.edit_link_btn.clicked.connect(self.edit_link)
+            
+        except Exception as e:
+            logging.error(f"Error connecting signals: {e}")
+    
 
     # background function
+    def create_dir_jsonlog(self):
+        try:
+            if not os.path.exists(APPDATA_PATH):
+                os.makedirs(APPDATA_PATH)
+            # Configure logging with TimedRotatingFileHandler
+            log_handler = TimedRotatingFileHandler(APP_LOG_PATH, when="midnight", interval=1, backupCount=7)
+            log_handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s]: %(message)s'))
+            logging.getLogger().addHandler(log_handler)
+            logging.getLogger().setLevel(logging.INFO)  # Adjust the log level as needed
+        except Exception as e:
+            logging.error(f"Error creating directories: {e}")
+    
     def get_radio_btn(self):
         # Get the selected radio button's text
         selected_option = NO_SOCIAL_MEDIA_SELECTED
@@ -133,17 +165,14 @@ class MainWindow(QMainWindow):
     
     # home page ui function
     def image_label(self):
-        try:
-            if self.selected_files_list:
-                pixmap = QPixmap(self.selected_files_list[self.current_images_index]).scaled(
-                self.ui.image_label.size(),
-                aspectMode=Qt.AspectRatioMode.KeepAspectRatio,
-                mode=Qt.TransformationMode.SmoothTransformation
-            )
-                self.ui.image_label.setPixmap(pixmap)
-                self.image_nav_label()
-        except Exception as e:
-            print(f"Error showing image: {e}")
+        if self.selected_files_list:
+            pixmap = QPixmap(self.selected_files_list[self.current_images_index]).scaled(
+            self.ui.image_label.size(),
+            aspectMode=Qt.AspectRatioMode.KeepAspectRatio,
+            mode=Qt.TransformationMode.SmoothTransformation
+        )
+            self.ui.image_label.setPixmap(pixmap)
+            self.image_nav_label()
             
     def image_nav_label(self):
         self.ui.image_nav_label.setText(f"Image {self.current_images_index + 1}/{len(self.selected_files_list)}")
@@ -169,17 +198,14 @@ class MainWindow(QMainWindow):
     
     def remove(self):
         """Remove the currently displayed image."""
-        try:
-            if self.selected_files_list:
-                self.selected_files_list.pop(self.current_images_index)
-                if not self.selected_files_list:
-                    self.reset_viewer_state()
-                else:
-                    self.current_images_index = min(self.current_images_index, len(self.selected_files_list) - 1)
-                self.image_label()
-        except Exception as e:
-            print(f"Error removing image: {e}")
-            
+        if self.selected_files_list:
+            self.selected_files_list.pop(self.current_images_index)
+            if not self.selected_files_list:
+                self.reset_viewer_state()
+            else:
+                self.current_images_index = min(self.current_images_index, len(self.selected_files_list) - 1)
+            self.image_label()
+    
     def reset_viewer_state(self):
         """Reset the state of the image viewer."""
         self.current_images_index = 0
@@ -213,16 +239,23 @@ class MainWindow(QMainWindow):
                         self.ui.home_table.setItem(home_row_index, NAME_COLUMN_INDEX, home_table_item)
 
     def post(self):
-        text = self.ui.post_text_input.toPlainText()
-        data = self.link_manager.read_json(DATA_JSON_PATH)
-        def post_thread():
-            for index, (key_name, object) in enumerate(data.items()):
-                if object[CHECKBOX] == 1:
-                    url = object[LINK]
-                    self.post_automation.post_fb_group(url, text, self.selected_files_list)
-        post_thread_instance = Thread(target=post_thread)
-        post_thread_instance.start()
-        post_thread_instance.join()
+        try:
+            text = self.ui.post_text_input.toPlainText()
+            data = self.link_manager.read_json(DATA_JSON_PATH)
+            def post_thread():
+                try:
+                    for index, (key_name, object) in enumerate(data.items()):
+                        if object[CHECKBOX] == 1:
+                            url = object[LINK]
+                            self.post_automation.post_fb_group(url, text, self.selected_files_list)
+                except Exception as e:
+                    logging.error(f"Error in the background thread: {e}")
+            post_thread_instance = Thread(target=post_thread)
+            post_thread_instance.start()
+            post_thread_instance.join()
+        except Exception as e:
+            logging.error(f"Error in the post method: {e}")
+
 
     # account page ui function
     def add_link(self):
