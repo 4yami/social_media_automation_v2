@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QTableWidgetItem, QCheckBox, QMessageBox, QFileDialog
 )
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QPixmap
+from PySide6.QtGui import QPixmap, QIcon
 
 from main_ui import Ui_MainWindow
 from post_automation import PostAutomation
@@ -67,6 +67,7 @@ class MainWindow(QMainWindow):
     def setup_ui(self):
         # Set up the user interface
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon("auto.png"))
         QApplication.setStyle(QStyleFactory.create("fusion"))
         self.ui.page_widget.setCurrentIndex(0)
         self.ui.radio_buttons_dict = {
