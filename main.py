@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+from threading import Thread
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QStyleFactory,
     QTableWidgetItem, QCheckBox, QMessageBox, QFileDialog
@@ -9,7 +10,7 @@ from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QPixmap
 
 from main_ui import Ui_MainWindow
-# from post_automation import PostAutomation
+from post_automation import PostAutomation
 
 DATA_JSON_PATH = "data.json"
 HOME_COLUMN_WIDTHS = [40, 197]
@@ -19,6 +20,7 @@ ACCOUNT_COLUMN_WIDTHS = [40, 200, 450]
 NO_SOCIAL_MEDIA_SELECTED = "No option selected"
 CHECKBOX = "checkbox"
 LINK_NAME = "link_name"
+LINK = 'link'
 
 CHECKBOX_COLUMN_INDEX = 0
 NAME_COLUMN_INDEX = 1
@@ -55,6 +57,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.link_manager = LinkManager()
+        self.post_automation = PostAutomation()
         self.account_checkboxes = {}
         self.selected_files_list = []
         self.current_images_index = 0
@@ -89,6 +92,7 @@ class MainWindow(QMainWindow):
         self.ui.previous_btn.clicked.connect(self.previous)
         self.ui.next_btn.clicked.connect(self.next)
         self.ui.remove_btn.clicked.connect(self.remove)
+        self.ui.post_btn.clicked.connect(self.post)
         
         # for account
         self.ui.add_link_btn.clicked.connect(self.add_link)
@@ -135,8 +139,8 @@ class MainWindow(QMainWindow):
                 aspectMode=Qt.AspectRatioMode.KeepAspectRatio,
                 mode=Qt.TransformationMode.SmoothTransformation
             )
-            self.ui.image_label.setPixmap(pixmap)
-            self.image_nav_label()
+                self.ui.image_label.setPixmap(pixmap)
+                self.image_nav_label()
         except Exception as e:
             print(f"Error showing image: {e}")
             
@@ -150,7 +154,6 @@ class MainWindow(QMainWindow):
         if file_dialog.exec() == QFileDialog.Accepted:
             selected_files = file_dialog.selectedFiles()
             self.selected_files_list.extend(selected_files)
-            print(self.selected_files_list)
             self.image_label()
     
     def previous(self):
@@ -208,6 +211,17 @@ class MainWindow(QMainWindow):
                         home_table_item = QTableWidgetItem(str(cell_data))
                         self.ui.home_table.setItem(home_row_index, NAME_COLUMN_INDEX, home_table_item)
 
+    def post(self):
+        text = self.ui.post_text_input.toPlainText()
+        data = self.link_manager.read_json(DATA_JSON_PATH)
+        def post_thread():
+            for index, (key_name, object) in enumerate(data.items()):
+                if object[CHECKBOX] == 1:
+                    url = object[LINK]
+                    self.post_automation.post_fb_group(url, text, self.selected_files_list)
+        post_thread_instance = Thread(target=post_thread)
+        post_thread_instance.start()
+        post_thread_instance.join()
 
     # account page ui function
     def add_link(self):

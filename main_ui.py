@@ -152,11 +152,11 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addItem(self.verticalSpacer_2)
 
-        self.post_input = QTextEdit(self.home_page)
-        self.post_input.setObjectName(u"post_input")
-        self.post_input.setMaximumSize(QSize(600000, 120))
+        self.post_text_input = QTextEdit(self.home_page)
+        self.post_text_input.setObjectName(u"post_text_input")
+        self.post_text_input.setMaximumSize(QSize(600000, 120))
 
-        self.verticalLayout_2.addWidget(self.post_input)
+        self.verticalLayout_2.addWidget(self.post_text_input)
 
         self.post_btn = QPushButton(self.home_page)
         self.post_btn.setObjectName(u"post_btn")
@@ -357,7 +357,7 @@ class Ui_MainWindow(object):
         self.home_btn.setText(QCoreApplication.translate("MainWindow", u"Home", None))
         self.account_btn.setText(QCoreApplication.translate("MainWindow", u"Account", None))
         self.exit_btn.setText(QCoreApplication.translate("MainWindow", u"Exit", None))
-        self.image_label.setText(QCoreApplication.translate("MainWindow", u"image label", None))
+        self.image_label.setText("")
         self.image_nav_label.setText("")
         self.add_btn.setText(QCoreApplication.translate("MainWindow", u"Add", None))
         self.previous_btn.setText(QCoreApplication.translate("MainWindow", u"Previous", None))

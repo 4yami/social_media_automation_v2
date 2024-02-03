@@ -130,7 +130,7 @@
                 <bool>false</bool>
                </property>
                <property name="text">
-                <string>image label</string>
+                <string/>
                </property>
                <property name="alignment">
                 <set>Qt::AlignCenter</set>
@@ -234,7 +234,7 @@
               </spacer>
              </item>
              <item>
-              <widget class="QTextEdit" name="post_input">
+              <widget class="QTextEdit" name="post_text_input">
                <property name="maximumSize">
                 <size>
                  <width>600000</width>
