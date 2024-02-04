@@ -1,3 +1,4 @@
+# auto-py-to-exe
 import json
 import os
 import sys
@@ -84,7 +85,7 @@ class MainWindow(QMainWindow):
     def setup_ui(self):
         """Set up the user interface."""
         self.ui.setupUi(self)
-        self.setWindowIcon(QIcon("auto.png"))
+        self.setWindowIcon(QIcon(os.path.join(os.path.dirname(sys.argv[0]), 'auto.png')))
         QApplication.setStyle(QStyleFactory.create("fusion"))
         self.ui.page_widget.setCurrentIndex(0)
         self.ui.radio_buttons_dict = {
