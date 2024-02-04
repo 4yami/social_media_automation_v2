@@ -6,7 +6,7 @@ from playwright.sync_api import sync_playwright
 class PostAutomation():
     
     def open_chrome(self):
-        command = '"C:\Program Files\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222 --no-session-restore'
+        command = '"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --remote-debugging-port=9222 --no-session-restore'
         subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     
     def goto_page(self, url):
@@ -49,13 +49,13 @@ class PostAutomation():
             self.page.close()
     
     
-if __name__ == "__main__":
-    url = "https://www.facebook.com/groups/5511711472209823"
-    text = "anything"
-    image_paths = [
-        'C:\\Users\\syahm\\Pictures\\hatsu\\hatsu14.jpg', 
-        'C:\\Users\\syahm\\Pictures\\hatsu\\hatsu9.jpg'
-        ]
-    klas = PostAutomation()
-    klas.post_fb_group()
+# if __name__ == "__main__":
+#     url = "https://www.facebook.com/groups/5511711472209823"
+#     text = "anything"
+#     image_paths = [
+#         'C:\\Users\\syahm\\Pictures\\hatsu\\hatsu14.jpg', 
+#         'C:\\Users\\syahm\\Pictures\\hatsu\\hatsu9.jpg'
+#         ]
+#     klas = PostAutomation()
+#     klas.post_fb_group()
     

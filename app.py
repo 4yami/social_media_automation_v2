@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QStyleFactory,
     QTableWidgetItem, QCheckBox, QMessageBox, QFileDialog
 )
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtCore import Qt, QFile, QTextStream
 from PySide6.QtGui import QPixmap, QIcon
 
 from main_ui import Ui_MainWindow
@@ -79,15 +79,17 @@ class MainWindow(QMainWindow):
         self.account_checkboxes = {}
         self.selected_files_list = []
         self.current_images_index = 0
+        self.style()
         self.setup_ui()
         self.connect_signals()
 
     def setup_ui(self):
         """Set up the user interface."""
         self.ui.setupUi(self)
-        self.setWindowIcon(QIcon(os.path.join(os.path.dirname(sys.argv[0]), 'auto.png')))
+        
+        self.setWindowIcon(QIcon(os.path.join(os.path.dirname(sys.argv[0]), 'images\\auto.png')))
         QApplication.setStyle(QStyleFactory.create("fusion"))
-        self.ui.page_widget.setCurrentIndex(0)
+        self.show_home_page()
         self.ui.radio_buttons_dict = {
             self.ui.facebook_group_rbtn: 'Facebook Group',
             self.ui.rbtn2: "rbtn2",
@@ -123,6 +125,11 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logging.error(f"Error connecting signals: {e}")
     
+    def style(self):
+        style_file = QFile("style\\style.qss")
+        style_file.open(QFile.ReadOnly | QFile.Text)
+        style_stream = QTextStream(style_file)
+        app.setStyleSheet(style_stream.readAll())
 
     # background function
     def create_dir_jsonlog(self):
@@ -354,15 +361,18 @@ class MainWindow(QMainWindow):
         # Switch to the home page and refresh the home table
         self.populate_home_table()
         self.ui.page_widget.setCurrentIndex(0)
+        self.ui.home_btn.setChecked(True)
 
     def show_account_page(self):
         # Switch to the account page and refresh the account table
         self.populate_account_table()
         self.ui.page_widget.setCurrentIndex(1)
+        self.ui.account_btn.setChecked(True)
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     window = MainWindow()
+    window.setWindowTitle("Social Media Automation")
     window.showMaximized()
     sys.exit(app.exec())
