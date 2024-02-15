@@ -15,17 +15,17 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QHBoxLayout, QHeaderView,
-    QLabel, QLineEdit, QMainWindow, QPushButton,
-    QRadioButton, QSizePolicy, QSpacerItem, QStackedWidget,
-    QTableWidget, QTableWidgetItem, QTextEdit, QVBoxLayout,
-    QWidget)
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFrame, QHBoxLayout,
+    QHeaderView, QLabel, QLineEdit, QMainWindow,
+    QPushButton, QRadioButton, QSizePolicy, QSpacerItem,
+    QStackedWidget, QTableWidget, QTableWidgetItem, QTextEdit,
+    QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1139, 623)
+        MainWindow.resize(1009, 539)
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -128,10 +128,6 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.add_btn)
 
-        self.horizontalSpacer = QSpacerItem(20, 20, QSizePolicy.Preferred, QSizePolicy.Minimum)
-
-        self.horizontalLayout.addItem(self.horizontalSpacer)
-
         self.previous_btn = QPushButton(self.home_page)
         self.previous_btn.setObjectName(u"previous_btn")
 
@@ -142,10 +138,6 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.next_btn)
 
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Preferred, QSizePolicy.Minimum)
-
-        self.horizontalLayout.addItem(self.horizontalSpacer_2)
-
         self.remove_btn = QPushButton(self.home_page)
         self.remove_btn.setObjectName(u"remove_btn")
 
@@ -154,9 +146,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addLayout(self.horizontalLayout)
 
-        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.line_2 = QFrame(self.home_page)
+        self.line_2.setObjectName(u"line_2")
+        self.line_2.setFrameShape(QFrame.HLine)
+        self.line_2.setFrameShadow(QFrame.Sunken)
 
-        self.verticalLayout_2.addItem(self.verticalSpacer_2)
+        self.verticalLayout_2.addWidget(self.line_2)
 
         self.post_text_input = QTextEdit(self.home_page)
         self.post_text_input.setObjectName(u"post_text_input")
@@ -307,9 +302,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_3.addLayout(self.horizontalLayout_12)
 
-        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Minimum)
+        self.line = QFrame(self.account_page)
+        self.line.setObjectName(u"line")
+        self.line.setFrameShape(QFrame.HLine)
+        self.line.setFrameShadow(QFrame.Sunken)
 
-        self.verticalLayout_3.addItem(self.verticalSpacer_3)
+        self.verticalLayout_3.addWidget(self.line)
 
         self.account_table = QTableWidget(self.account_page)
         self.account_table.setObjectName(u"account_table")
